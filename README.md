@@ -37,6 +37,17 @@ See [`examples/status-reply.md`](examples/status-reply.md) for a sample reply.
 
 ## Install
 
+### Full kit, one command (recommended)
+
+Installs adhd-status plus its required companion [`unlazy`](https://github.com/Leonxlnx/unlazy)
+as personal skills, linked so `git pull` updates them:
+
+```bash
+mkdir -p ~/src ~/.claude/skills && git clone https://github.com/maumoya/adhd-status.git ~/src/adhd-status && git clone https://github.com/Leonxlnx/unlazy.git ~/src/unlazy && ln -s ~/src/adhd-status/skills/adhd-status ~/.claude/skills/adhd-status && ln -s ~/src/unlazy ~/.claude/skills/unlazy
+```
+
+Restart Claude Code (or start a new session), then say `STATUS`.
+
 ### As a Claude Code plugin
 
 ```
