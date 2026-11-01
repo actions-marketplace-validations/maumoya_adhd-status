@@ -1,4 +1,17 @@
+<p align="center">
+  <img src="assets/header.png" alt="adhd-status: say STATUS, get one tiny table and one next step" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Claude%20Code-skill%20%2B%20plugin-7c5cfc" alt="Claude Code skill and plugin">
+  <img src="https://img.shields.io/badge/ADHD-friendly-22c55e" alt="ADHD friendly">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
+</p>
+
 # adhd-status
+
+**The ADHD-friendly status board for Claude Code and AI coding agents.** Say `STATUS`, get one
+tiny table and one next step. Built for focus, executive function and context management.
 
 A skill for Claude Code (and other agents that read `SKILL.md` skills) that turns **STATUS** into
 a zero-reading status board.

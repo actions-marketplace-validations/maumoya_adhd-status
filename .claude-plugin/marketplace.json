@@ -10,7 +10,22 @@
       "name": "adhd-status",
       "description": "One tiny status table and one clickable next step when you say STATUS.",
       "source": "./",
-      "category": "productivity"
+      "category": "productivity",
+      "keywords": [
+        "adhd",
+        "claude-code",
+        "claude-skill",
+        "agent-skills",
+        "status",
+        "productivity",
+        "focus",
+        "executive-function",
+        "neurodivergent",
+        "task-tracking",
+        "context-management",
+        "compact",
+        "next-action"
+      ]
     }
   ]
 }
