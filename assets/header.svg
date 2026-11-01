@@ -63,4 +63,5 @@
     <rect x="900" y="520" width="300" height="56" rx="28" fill="url(#badge)"/>
     <text x="1050" y="556" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">▶  npm run migrate</text>
   </g>
+<text x="1200" y="112" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" fill="#D8D2F5">by <tspan font-weight="700" fill="#FFFFFF">Mauricio Moya</tspan> · @maumoya</text>
 </svg>
