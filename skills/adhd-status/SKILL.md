@@ -41,10 +41,12 @@ about the sweep; the user only sees the result.
 
 The user should never have to report back to you.
 
-- For any command you gave them, look at the result yourself: read their terminal if your host can
-  (a terminal-reading tool), otherwise check the effect (the file exists, the service answers, the
-  log line is there). Only if nothing can be checked, ask with a button ("Ran it" / "Not yet"),
-  never with "paste the output".
+- **Read the terminal yourself.** For any command you gave them, read the result before you
+  reply: their terminal if your host can (a terminal-reading tool; if the command is still
+  running, wait for its output rather than asking), otherwise check the effect (the file exists,
+  the service answers, the log line is there). Do this every turn after a command, also when the
+  user only says "done", "ran it" or "STATUS". Never wait for them to copy and paste output. Only
+  if nothing can be checked, ask with a button ("Ran it" / "Not yet").
 - Verify live state with one cheap call each when it matters (CI status, a job's last line, a
   thread's last report). Read only the lines you need. Do not re-read what is already in context;
   that wastes tokens.
@@ -88,10 +90,18 @@ every reply and makes things easy to lose.
   for it, with a one-line brief that names the task and says where it came from (this thread).
 - **Stay in your lane.** A thread works only on its own task. It does not take over, redo or edit
   what another thread is doing; at most it shows that thread's state as one ⏸ or 🔄 row.
-- **Task finished?** The thread hands back: the next action is to report the result to the thread
-  it came from (its parent), so that thread updates its own status table, then compact and close
-  (archive) this one. The parent picks up its next task, which may start a new child thread. This
-  loop repeats until the work is done.
+- **Task finished?** The thread hands back, and does as much of it itself as the host allows:
+  1. Report the result to the parent thread (a message tool if the host has one, else the hub's
+     `ROADMAP.md` row), so the parent updates its own status table.
+  2. Close this thread: archive it if the host has a tool for that. If the thread stays open for
+     later, compact it first (or tell the user the `/compact` line); do not compact a thread you
+     are archiving, that is wasted work.
+  3. End with one tiny reply: one line saying it is done and closed, and exactly one button,
+     **Back to parent**, that takes the user to the parent thread. Without buttons, one line
+     naming the parent thread to open.
+
+  The parent picks up its next task, which may start a new child thread. This loop repeats until
+  the work is done.
 
 ### The roadmap file (hub mode)
 

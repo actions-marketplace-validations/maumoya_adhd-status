@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-The table shows the checkout fix as done with a ✅.
+The reply shows the checkout fix as done with a ✅ (in a table row or the one-line hand-back).

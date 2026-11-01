@@ -1,0 +1,9 @@
+$ npm run migrate
+
+> app@1.4.0 migrate
+> prisma migrate deploy
+
+Applying migration `20261101_add_invoices`
+Error: P3018 A migration failed to apply. Migration name: 20261101_add_invoices
+Database error: column "customer_id" of relation "invoices" already exists
+$
