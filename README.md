@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/header.png" alt="adhd-status: say STATUS, get one tiny table and one next step" width="100%">
+  <img src="assets/header.png" alt="adhd-status, a free open source ADHD-friendly status board skill for Claude Code: say STATUS, get one tiny table and one next step" width="100%">
 </p>
 
 <p align="center">
@@ -11,11 +11,12 @@
 
 # adhd-status
 
-**The ADHD-friendly status board for Claude Code and AI coding agents.** Say `STATUS`, get one
-tiny table and one next step. Built for focus, executive function and context management.
+**The free, open source ADHD-friendly status board for Claude Code and AI coding agents.** Say
+`STATUS`, get one tiny table and one next step. Built for focus, executive function and context
+management. MIT licensed.
 
-A skill for Claude Code (and other agents that read `SKILL.md` skills) that turns **STATUS** into
-a zero-reading status board.
+An open source skill for Claude Code (and other agents that read `SKILL.md` skills, the open Agent
+Skills format) that turns **STATUS** into a zero-reading status board.
 
 Say `STATUS` in any working session and you get:
 
@@ -103,6 +104,31 @@ claude plugin eval .
 
 It runs each case with and without the skill and reports the score difference. These are real
 model runs and are billed to your account.
+
+## FAQ
+
+**What is adhd-status?**
+A free, open source (MIT) skill for Claude Code and other AI coding agents. When you say `STATUS`,
+the agent replies with one tiny Task | Why | Status table and exactly one next step you can click
+or run.
+
+**Who is it for?**
+Developers with ADHD, and anyone who loses track of tasks, pending commands or promises in long AI
+coding sessions.
+
+**Is it free and open source?**
+Yes. MIT license, OSI-approved. Use it, fork it, change it.
+
+**Which agents does it work with?**
+Claude Code (as a skill or a plugin) and any agent that loads `SKILL.md` skills.
+
+**How is it different from a todo list?**
+The agent builds the board itself from the whole conversation, checks results on its own (no
+pasting output), shows at most 4 rows and gives one next action, so there is nothing to read
+through.
+
+**Does it need anything else?**
+The `unlazy` skill, so nothing gets missed. The one-command install above sets up both.
 
 ## Credits
 
