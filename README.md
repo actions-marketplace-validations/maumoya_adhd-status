@@ -26,6 +26,9 @@ Say `STATUS` in any working session and you get:
 - no "paste the output" or "tell me when done": the agent checks results itself
 - **one task per thread**: new work goes to a new thread; a finished thread reports back to its
   parent thread, then compacts and closes
+- **hub mode**: a `ROADMAP.md` file is the summary page of every task in flight. One hub thread
+  keeps it (your existing roadmap thread if you have one, else the root thread); child threads
+  update only their own row when they hand back; STATUS in the hub thread shows the top 4 rows
 - a nudge to compact (at a milestone, never mid-fix) or start fresh when the conversation gets long
 
 Built for ADHD brains, useful for anyone juggling several things in one session.

@@ -62,7 +62,9 @@ The user should never have to report back to you.
 - At most 4 rows. Needs-the-user and problems first, then running, then done.
 - Show wins: anything finished since the last STATUS gets a ✅ row (finishing things is
   motivating). Older done items are noise; leave them out.
-- More than 4 open items? Keep the 3 most urgent and make row 4 `+N more | parked | ⏸`.
+- More than 4 rows to show? Count all of them (wins, parked tasks and the unlazy row included).
+  Keep the 3 most urgent and make row 4 `+N more | parked | ⏸` (in the hub thread:
+  `+N more | in ROADMAP.md | ⏸`). Never drop items silently to fit.
 - **Task**: 2–4 plain words. No links, ticket or PR numbers, branch names, hashes or file paths.
 - **Why**: up to 6 plain words, the benefit to the user, not the mechanism.
 - **Status**: one emoji and up to 5 words. On a 👉 row add a real time estimate (`~2 min`) so
@@ -90,6 +92,36 @@ every reply and makes things easy to lose.
   it came from (its parent), so that thread updates its own status table, then compact and close
   (archive) this one. The parent picks up its next task, which may start a new child thread. This
   loop repeats until the work is done.
+
+### The roadmap file (hub mode)
+
+Threads come and go; a file stays. The project's `ROADMAP.md` is the one summary of every task in
+flight, and one **hub thread** keeps it. If the user already has a roadmap thread, that thread is
+the hub; never start a second one. Otherwise the root thread (the one with no parent) is the hub.
+Below, "hub thread" means whichever of the two it is.
+
+- **Where**: `ROADMAP.md` at the project root. If the project already has a roadmap file, use that
+  one; never start a second. Create it only the first time a thread is split off or handed back.
+- **Shape**: one table, newest work on top, plain words like the status table:
+
+  ```
+  | Task | Thread | Status | Updated |
+  |---|---|---|---|
+  | Signup form | signup-tests | 🔄 tests running | 2026-11-01 |
+  | Rate limit | (not started) | ⏸ after signup | 2026-11-01 |
+  | README typo | readme-fix | ✅ merged | 2026-10-31 |
+  ```
+
+  Keep at most 5 ✅ rows; move older ones to a `## Done` list under the table, one line each.
+- **Opening a child thread**: add its row (status ⏸ or 🔄) before or right after you start it.
+- **Handing back**: the child edits **only its own row** (status and date), then reports to the
+  parent. Re-read the file just before writing and change that one line, so two threads never
+  overwrite each other. Ordering, new rows for other tasks and cleanup belong to the hub thread.
+- **STATUS in the hub thread**: read `ROADMAP.md`, check the live state of any 🔄 row that can be
+  checked cheaply, fix stale rows, then show the usual table: its 4 most urgent rows (row 4 is
+  `+N more | in ROADMAP.md | ⏸` when there are more). The file is the full page; the reply stays
+  tiny.
+- **STATUS in any other thread**: show only that thread's own task; do not summarize the roadmap.
 
 ## Step 5: context (compacting)
 
