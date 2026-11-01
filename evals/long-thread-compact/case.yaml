@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: long-thread-compact
+expected_outcome: |
+  A tiny table whose next action is to compact or start a fresh conversation, with no long list of the eleven finished tasks.
