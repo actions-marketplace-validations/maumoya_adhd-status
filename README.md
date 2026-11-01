@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/Claude%20Code-skill%20%2B%20plugin-7c5cfc" alt="Claude Code skill and plugin">
   <img src="https://img.shields.io/badge/ADHD-friendly-22c55e" alt="ADHD friendly">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
+  <a href="https://opensource.org/license/mit"><img src="https://img.shields.io/badge/Open%20Source-OSI%20approved%20license-3DA639?logo=opensourceinitiative&logoColor=white" alt="Open Source: OSI-approved MIT license"></a>
 </p>
 
 # adhd-status
@@ -113,3 +114,6 @@ model runs and are billed to your account.
 ## License
 
 MIT. Copyright (c) 2026 Mauricio Alonso Moya Tapia.
+
+The Open Source Initiative® logo is a trademark of the Open Source Initiative. Its use here only
+marks that the MIT license is OSI-approved; it does not imply OSI endorsement of this project.
