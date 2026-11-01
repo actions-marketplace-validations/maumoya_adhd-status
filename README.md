@@ -7,6 +7,7 @@
   <img src="https://img.shields.io/badge/ADHD-friendly-22c55e" alt="ADHD friendly">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
   <a href="https://opensource.org/license/mit"><img src="https://img.shields.io/badge/Open%20Source-OSI%20approved%20license-3DA639?logo=opensourceinitiative&logoColor=white" alt="Open Source: OSI-approved MIT license"></a>
+  <a href="PRIVACY.md"><img src="https://img.shields.io/badge/privacy-no%20tracking%20%C2%B7%20no%20data%20collected-7c5cfc" alt="Privacy: no tracking, no data collected"></a>
 </p>
 
 # adhd-status
