@@ -27,6 +27,12 @@ git clone https://github.com/maumoya/adhd-status.git && cd adhd-status && git ls
 
 Every file is Markdown, YAML, JSON, plain text or an image.
 
+## Independent check
+
+The [OpenSSF Scorecard](https://scorecard.dev/viewer/?uri=github.com/maumoya/adhd-status), run by
+the Open Source Security Foundation, scans this repository automatically every week and on every
+change. Its score is the badge at the top of the README.
+
 ## Reporting a problem
 
 Open an issue at https://github.com/maumoya/adhd-status/issues.
