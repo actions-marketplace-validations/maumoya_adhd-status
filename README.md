@@ -5,12 +5,15 @@ a zero-reading status board.
 
 Say `STATUS` in any working session and you get:
 
-- one tiny **Task | Why | Status** table (4 rows max, plain words, emoji status)
+- one tiny **Task | Why | Status** table (4 rows max, plain words, emoji status, time estimates on
+  your-turn rows, wins shown as ✅)
 - exactly **one** next action you can click or run
-- nothing forgotten: the agent silently sweeps the whole conversation first, so promised-but-dropped
-  work shows up as a row
+- nothing forgotten: the agent sweeps the whole conversation with the `unlazy` skill first, so
+  promised-but-dropped work shows up as a row
 - no "paste the output" or "tell me when done": the agent checks results itself
-- a nudge to compact or start fresh when the conversation gets long and slow
+- **one task per thread**: new work goes to a new thread; a finished thread reports back to its
+  parent thread, then compacts and closes
+- a nudge to compact (at a milestone, never mid-fix) or start fresh when the conversation gets long
 
 Built for ADHD brains, useful for anyone juggling several things in one session.
 
@@ -18,24 +21,30 @@ See [`examples/status-reply.md`](examples/status-reply.md) for a sample reply.
 
 ## Install
 
-Claude Code loads personal skills from `~/.claude/skills/`.
+### As a Claude Code plugin
 
-Copy:
-
-```bash
-git clone https://github.com/maumoya/adhd-status.git
-mkdir -p ~/.claude/skills/adhd-status
-cp adhd-status/SKILL.md ~/.claude/skills/adhd-status/
+```
+/plugin marketplace add maumoya/adhd-status
+/plugin install adhd-status@adhd-status
 ```
 
-Or symlink, so `git pull` updates it:
+### As a plain skill
+
+Claude Code loads personal skills from `~/.claude/skills/`.
 
 ```bash
 git clone https://github.com/maumoya/adhd-status.git ~/src/adhd-status
-ln -s ~/src/adhd-status ~/.claude/skills/adhd-status
+ln -s ~/src/adhd-status/skills/adhd-status ~/.claude/skills/adhd-status
 ```
 
-For one project only, put it in that project's `.claude/skills/adhd-status/` instead.
+The symlink means `git pull` updates it. To copy instead, copy the `skills/adhd-status` folder to
+`~/.claude/skills/`. For one project only, put it in that project's `.claude/skills/`.
+
+### Companion: unlazy (required)
+
+The status sweep runs the [`unlazy`](https://github.com/Leonxlnx/unlazy) skill so nothing is
+missed. Install it the same way, as `~/.claude/skills/unlazy/`. Until you do, adhd-status uses a
+built-in checklist and shows a row reminding you to install it.
 
 ## Use
 
@@ -48,13 +57,13 @@ where are we
 what's left
 ```
 
-## Optional extras
+## Tip: keep the board through compaction
 
-- **`unlazy`** or another completion-discipline skill: if installed, the sweep uses its gate check.
-  Without it, the skill uses its own built-in checklist.
-- **Clickable buttons / terminal reading**: if your app offers option buttons or a tool that reads
-  your terminal, the skill uses them. Otherwise it falls back to a one-key pick list and checking
-  results directly.
+Add this line to your project's `CLAUDE.md` so a `/compact` keeps what the board needs:
+
+```
+Compact instructions: keep every open task, its status, any command given to me, and the parent thread this one reports to.
+```
 
 ## Test it (benchmark)
 
@@ -66,6 +75,13 @@ claude plugin eval .
 
 It runs each case with and without the skill and reports the score difference. These are real
 model runs and are billed to your account.
+
+## Credits
+
+- Time estimates, visible wins and the no-preamble rule are inspired by
+  [i-have-adhd](https://github.com/ayghri/i-have-adhd) by Ayoub G. (MIT). It pairs well with this
+  skill if you want every reply ADHD-shaped, not just STATUS.
+- The completion sweep uses [unlazy](https://github.com/Leonxlnx/unlazy) (MIT).
 
 ## License
 

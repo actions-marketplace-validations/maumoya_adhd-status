@@ -1,7 +1,8 @@
 # Example
 
 Earlier in the session the assistant asked the user to run a database migration, opened a
-change whose tests are still running, and promised a rate limit that was never added.
+change whose tests are still running, fixed a README typo, and promised a rate limit that was
+never added.
 
 **User:** `STATUS`
 
@@ -9,9 +10,10 @@ change whose tests are still running, and promised a rate limit that was never a
 
 | Task | Why | Status |
 |---|---|---|
-| Database migration | new signup fields work | 👉 you: run it |
+| Database migration | new signup fields work | 👉 you: run it, ~1 min |
 | Login rate limit | stops password guessing | ⚠️ forgotten, not started |
 | Signup form | new users can join | 🔄 tests running |
+| README typo | docs read right | ✅ merged |
 
 ```bash
 npm run migrate

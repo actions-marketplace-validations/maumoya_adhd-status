@@ -1,0 +1,10 @@
+{
+  "name": "adhd-status",
+  "version": "1.1.0",
+  "description": "Say STATUS and get one tiny Task | Why | Status table plus one clickable next step. Sweeps the whole conversation so nothing is forgotten, keeps one task per thread, and knows when to compact.",
+  "author": {
+    "name": "Mauricio Alonso Moya Tapia",
+    "url": "https://github.com/maumoya"
+  },
+  "license": "MIT"
+}

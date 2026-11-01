@@ -1,0 +1,16 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "adhd-status",
+  "description": "Zero-reading STATUS board for ADHD brains.",
+  "owner": {
+    "name": "Mauricio Alonso Moya Tapia"
+  },
+  "plugins": [
+    {
+      "name": "adhd-status",
+      "description": "One tiny status table and one clickable next step when you say STATUS.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+---
+name: adhd-status
+description: Zero-reading status board for ADHD brains. Use whenever the user says STATUS (any case, alone or inside a sentence), "status?", "where are we", "what's left", "what do I do now", or "lazy adhd rule" during a working session. Sweeps the whole conversation with the unlazy skill so nothing is forgotten, then replies with one tiny Task | Why | Status table and exactly one next action the user can click or run. Checks results itself instead of asking the user to paste output, keeps one task per thread, and says when to compact or hand back to the parent thread.
+license: MIT
+---
+
+# adhd-status
+
+The user has ADHD. Long replies get skipped, open questions get lost, and "tell me when it's done"
+means it never gets done. When they say **STATUS**, give them one tiny table and one next step.
+Nothing else: no preamble, no recap, no closing line. The value is that they can glance, click,
+and move on.
+
+## Step 1: sweep the whole conversation with unlazy (silently)
+
+Before writing anything, invoke the `unlazy` skill and run its gate check over the **entire**
+conversation, not just the last few messages. This step is not optional: missing an item is the
+one failure this skill exists to prevent.
+
+The sweep must cover:
+
+- tasks, sub-tasks and side jobs (background runs, other threads, subagents)
+- changes waiting to be reviewed, merged, deployed or released
+- commands you handed the user to run
+- promises you made ("I'll check after…", "next I'll…")
+- questions you asked that never got an answer
+
+Mark each one: **done**, **running**, **waiting on the user**, **waiting on something else**, or
+**forgotten**. Forgotten items become rows; never drop one quietly.
+
+If `unlazy` is not installed, run the checklist above yourself and make the last row
+`unlazy skill | nothing gets missed | 👉 install it`, so the user fixes it once.
+
+**After a compaction**, the earlier conversation is only a summary. Rebuild the list from that
+summary plus live checks (CI, job logs, the terminal, the repository), not from memory alone.
+
+Do the sweep with your own reasoning and tool calls. Do not print the list, the gates or any notes
+about the sweep; the user only sees the result.
+
+## Step 2: check, don't ask
+
+The user should never have to report back to you.
+
+- For any command you gave them, look at the result yourself: read their terminal if your host can
+  (a terminal-reading tool), otherwise check the effect (the file exists, the service answers, the
+  log line is there). Only if nothing can be checked, ask with a button ("Ran it" / "Not yet"),
+  never with "paste the output".
+- Verify live state with one cheap call each when it matters (CI status, a job's last line, a
+  thread's last report). Read only the lines you need. Do not re-read what is already in context;
+  that wastes tokens.
+
+## Step 3: the table
+
+```
+| Task | Why | Status |
+|---|---|---|
+| Login page | users can sign in | 👉 you: run test, ~2 min |
+| Nightly backup | don't lose data | 🔄 running |
+| Old API cleanup | forgot it earlier | ⚠️ not started |
+```
+
+- At most 4 rows. Needs-the-user and problems first, then running, then done.
+- Show wins: anything finished since the last STATUS gets a ✅ row (finishing things is
+  motivating). Older done items are noise; leave them out.
+- More than 4 open items? Keep the 3 most urgent and make row 4 `+N more | parked | ⏸`.
+- **Task**: 2–4 plain words. No links, ticket or PR numbers, branch names, hashes or file paths.
+- **Why**: up to 6 plain words, the benefit to the user, not the mechanism.
+- **Status**: one emoji and up to 5 words. On a 👉 row add a real time estimate (`~2 min`) so
+  starting feels small.
+
+| Emoji | Means |
+|---|---|
+| ✅ | done / live |
+| 🔄 | running, nothing for you to do |
+| 👉 | your turn (it is the next action below) |
+| ⏸ | waiting on something else |
+| ⚠️ | problem or forgotten |
+| ❌ | failed |
+
+## Step 4: one task per thread
+
+A thread (conversation, session) owns exactly **one** task. Mixing tasks fills the context, slows
+every reply and makes things easy to lose.
+
+- **New unrelated task showed up?** Do not start it here. The next action is to open a new thread
+  for it, with a one-line brief that names the task and says where it came from (this thread).
+- **Stay in your lane.** A thread works only on its own task. It does not take over, redo or edit
+  what another thread is doing; at most it shows that thread's state as one ⏸ or 🔄 row.
+- **Task finished?** The thread hands back: the next action is to report the result to the thread
+  it came from (its parent), so that thread updates its own status table, then compact and close
+  (archive) this one. The parent picks up its next task, which may start a new child thread. This
+  loop repeats until the work is done.
+
+## Step 5: context (compacting)
+
+Long conversations get slow, expensive and forgetful. Check this on every STATUS.
+
+- **Task finished, or the topic is about to change**: prefer a fresh start (hand back and close, or
+  `/clear` in Claude Code) over compacting; it is cheaper.
+- **Same task, thread is long** (many steps done, big tool outputs, or the host reports high context
+  use): add the row `Context | save tokens | ⚠️ big → compact` and make compacting the next action.
+  Do it at a milestone (after a merge, after a bug is fixed), never in the middle of a fix.
+- You usually cannot compact yourself; the user runs it. Give the exact command in a copy block,
+  naming the open tasks so they survive, for example:
+
+  ```
+  /compact focus on: signup form tests, login rate limit
+  ```
+
+- Before suggesting it, make sure every open item is already in the table.
+
+## Step 6: one next action (only if the user must act)
+
+Exactly one, directly under the table, with at most a few words of label and no explaining
+sentence:
+
+- **A decision**: clickable option buttons if your host has them (a question tool or next-step
+  buttons): recommended option first, at most 2 options. Without buttons, a numbered pick list of
+  at most 2 the user can answer with one key ("1" or "2").
+- **A command**: one fenced code block, one command, no `$` prompt, no output inside, so it can be
+  run or copied in one click. Next turn, check its result yourself (Step 2) without being asked.
+  Do not add a second question ("already ran it?") under the command; one action means one.
+- **A click somewhere**: one line saying exactly where to click, plus a "Done" button.
+
+If nothing needs the user, give no button. The last row's status can say "nothing for you".
+
+## Example
+
+User: `status`
+
+Bad (makes them read and type):
+
+> Great question! So far we refactored the auth module, and I opened a pull request. The CI is
+> running now. Once it passes, you might want to merge it. Also, earlier I mentioned the backup
+> script; could you run it and paste the output so I can check it? Let me know how you want to
+> proceed!
+
+Good:
+
+| Task | Why | Status |
+|---|---|---|
+| Backup script | don't lose data | 👉 you: run it, ~1 min |
+| Auth cleanup | fewer login bugs | 🔄 tests running |
+| README typo | docs read right | ✅ merged |
+
+```bash
+./scripts/backup.sh
+```
+
+## Never
+
+- Prose before the table, a paragraph after it, a recap of how you got here, or a closing line.
+- A list of future steps. One step per STATUS.
+- A question the user must type an answer to when a button or one key would do.
+- Links in the table (a link may go in the action line only if the user must open it).
+- Asking the user to paste output or "let me know when done".
+- Starting a second task in this thread, or working on another thread's task.
