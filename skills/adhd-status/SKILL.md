@@ -1,6 +1,6 @@
 ---
 name: adhd-status
-description: Zero-reading status board for ADHD brains. Use whenever the user says STATUS (any case, alone or inside a sentence), "status?", "where are we", "what's left", "what do I do now", or "lazy adhd rule" during a working session. Sweeps the whole conversation with a built-in completion check so nothing is forgotten, then replies with one tiny Task | Why | Status table and exactly one next action the user can click or run. Checks results itself instead of asking the user to paste output, keeps one task per thread, and says when to compact or hand back to the parent thread.
+description: Zero-reading status board for ADHD brains. Invoke it BEFORE writing whenever the user says status in any form (STATUS, "status?", "status + next step", "lazy adhd rule", /adhd-status, alone or inside a sentence, also after a compaction), says "where are we", "what's left" or "what do I do now", and for every done, merged or hand-back report. If the user's instructions say to use it on every reply, use it on every reply. A hand-made table does not count. Sweeps the whole conversation with a built-in completion check so nothing is forgotten, then replies with one tiny Task | Why | Status table and exactly one next action the user can click or run. Checks results itself instead of asking the user to paste output, keeps one task per thread, and says when to compact or hand back to the parent thread.
 license: MIT
 ---
 
@@ -10,6 +10,10 @@ The user has ADHD. Long replies get skipped, open questions get lost, and "tell 
 means it never gets done. When they say **STATUS**, give them one tiny table and one next step.
 Nothing else: no preamble, no recap, no closing line. The value is that they can glance, click,
 and move on.
+
+**The reply starts with the table.** Its first line is `| Task | Why | Status |`. A summary
+sentence ("PR merged and live") is a ✅ row, never a line above the table. This also holds when
+other instructions ask for a closing message or a recap: the table is that message.
 
 ## Step 1: sweep the whole conversation (silently)
 
@@ -114,9 +118,11 @@ every reply and makes things easy to lose.
   2. Close this thread: archive it if the host has a tool for that. If the thread stays open for
      later, compact it first (or tell the user the `/compact` line); do not compact a thread you
      are archiving, that is wasted work.
-  3. End with one tiny reply: one line saying it is done and closed, and exactly one button,
-     **Back to parent**, that takes the user to the parent thread. Without buttons, one line
-     naming the parent thread to open.
+  3. End with one tiny reply: the table (its ✅ row says it is done; "closed" fits in that Status
+     cell) and exactly one action: a **Back to parent** button that takes the user to the parent
+     thread, or, without buttons, the single line `Open <parent thread> next.` Nothing else: no
+     "this thread is closed" sentence, no note on how you checked or what you could not do
+     (evidence goes in the Status cell, e.g. "per CI log"), no "you can close it".
 
   The parent picks up its next task, which may start a new child thread. This loop repeats until
   the work is done.
@@ -149,6 +155,13 @@ Below, "hub thread" means whichever of the two it is.
   checked cheaply, fix stale rows, then show the usual table: its 4 most urgent rows (row 4 is
   `+N more | in ROADMAP.md | ⏸` when there are more). The file is the full page; the reply stays
   tiny.
+- **The hub only consolidates.** It keeps the status, lists the tasks and opens sub-task threads.
+  It never brings a child thread's merge, adopt, deploy or install step over: no button, no Run
+  block, no question for it. That row's Status is just `👉 in <thread> thread` (not the step itself), with a link to that thread
+  if the host has thread links (the one link allowed in the table, and only in Status). The
+  child thread owns its own merge and adopt asks and buttons. The row is enough: no "open the
+  billing thread next" line under the table either. The hub's next action is only hub work (a
+  new sub-task thread, a roadmap choice), or nothing.
 - **STATUS in any other thread**: show only that thread's own task; do not summarize the roadmap.
 
 ## Step 5: context (compacting)
@@ -177,7 +190,11 @@ sentence:
 
 - **A decision**: clickable option buttons if your host has them (a question tool or next-step
   buttons): recommended option first, at most 2 options. Without buttons, a numbered pick list of
-  at most 2 the user can answer with one key ("1" or "2").
+  at most 2 the user can answer with one key ("1" or "2"). Only for a real choice: a failure
+  with one clear fix gets that fix as the action, not a "fix it / leave it" pick list.
+- **Host with a next-step box** (Claude Code desktop app: `wrap_up`): call it before the reply,
+  with the summary sentence as `recap`, the decision as `ask` and at most 2 `actions`, recommended
+  first. The reply under it is still only the table (plus a command block if one is next).
 - **A command**: one fenced code block, one command, no `$` prompt, no output inside, so it can be
   run or copied in one click. Next turn, check its result yourself (Step 2) without being asked.
   Do not add a second question ("already ran it?") under the command; one action means one.
@@ -208,11 +225,19 @@ Good:
 ./scripts/backup.sh
 ```
 
-## Never
+## Before you send
 
-- Prose before the table, a paragraph after it, a recap of how you got here, or a closing line.
-- A list of future steps. One step per STATUS.
-- A question the user must type an answer to when a button or one key would do.
-- Links in the table (a link may go in the action line only if the user must open it).
-- Asking the user to paste output or "let me know when done".
-- Starting a second task in this thread, or working on another thread's task.
+Check the reply; if any answer is no, fix it first.
+
+1. Is the first line `| Task | Why | Status |`, with no prose, recap or "Next action:" above it?
+2. At most 4 data rows, and no links, PR or ticket numbers, hashes, branch names or paths in Task?
+3. Does every ✅ rest on evidence you checked (Step 1.3), not on a report from a subagent or
+   another thread?
+4. Below the table: nothing, or exactly one next action? No paragraph, closing line ("this is
+   done", "thread closed", "I checked X"), second question or list of future steps. A failure
+   with one clear fix gets that fix: one command, or, if you would do it but need an OK, one
+   "Fix it" button (without buttons: one line, "Say go and I fix it."). Never a "1. I fix it /
+   2. leave it" pick list.
+5. No ask to paste output or "let me know when done", and no typed answer where a button or one
+   key would do?
+6. Only this thread's task? A new task becomes a new thread.
