@@ -1,6 +1,6 @@
 ---
 name: adhd-status
-description: Zero-reading status board for ADHD brains. Invoke it BEFORE writing whenever the user says status in any form (STATUS, "status?", "status + next step", "lazy adhd rule", /adhd-status, alone or inside a sentence, also after a compaction), says "where are we", "what's left" or "what do I do now", and for every done, merged or hand-back report. If the user's instructions say to use it on every reply, use it on every reply. A hand-made table does not count. Sweeps the whole conversation with a built-in completion check so nothing is forgotten, then replies with one tiny Task | Why | Status table and exactly one next action the user can click or run. Checks results itself instead of asking the user to paste output, keeps one task per thread, and says when to compact or hand back to the parent thread.
+description: Zero-reading status board for ADHD brains. Invoke it BEFORE writing whenever the user says status in any form (STATUS, "status?", "status + next step", "lazy adhd rule", /adhd-status, alone or inside a sentence, also after a compaction), says "where are we", "what's left" or "what do I do now", and for every done, merged or hand-back report. If the user's instructions say to use it on every reply, use it on every reply the user types; a turn the user did not type (a background task finished, a notification, a wake-up) gets a new table only when a row changed. A hand-made table does not count. Sweeps the whole conversation with a built-in completion check so nothing is forgotten, then replies with one tiny Task | Why | Status table and exactly one next action the user can click or run. Checks results itself instead of asking the user to paste output, keeps one task per thread, and says when to compact or hand back to the parent thread.
 license: MIT
 ---
 
@@ -14,6 +14,13 @@ and move on.
 **The reply starts with the table.** Its first line is `| Task | Why | Status |`. A summary
 sentence ("PR merged and live") is a ✅ row, never a line above the table. This also holds when
 other instructions ask for a closing message or a recap: the table is that message.
+
+**No repeat tables.** A new table only when the user typed this turn (status, a question, a
+reply) or something they must see changed since your last table: a new ✅, ❌ or ⚠️, or a
+different 👉 action. A turn the user did not type (a background task or command finished, a
+task or thread notification, a scheduled wake-up, a hook sending the turn back) with no such
+change gets no table: at most one line naming what changed, or no reply at all. Rules that say
+"use it on every reply" or "every done report" mean replies to the user, not these turns.
 
 ## Step 1: sweep the whole conversation (silently)
 
@@ -79,6 +86,8 @@ The user should never have to report back to you.
 ```
 
 - At most 4 rows. Needs-the-user and problems first, then running, then done.
+- Same rows, same words: a row that did not change keeps its place and its exact Task, Why and
+  Status text from your last table. Only changed rows move or get new words.
 - Show wins: anything finished since the last STATUS gets a ✅ row (finishing things is
   motivating). Older done items are noise; leave them out.
 - More than 4 rows to show? Count all of them (wins and parked tasks included).
@@ -123,6 +132,27 @@ every reply and makes things easy to lose.
      thread, or, without buttons, the single line `Open <parent thread> next.` Nothing else: no
      "this thread is closed" sentence, no note on how you checked or what you could not do
      (evidence goes in the Status cell, e.g. "per CI log"), no "you can close it".
+
+- **This thread's own task done?** Every row about this thread's own work is ✅. A row that
+  only shows another thread's work (a child or sibling thread still 🔄 or ⏸) does not count:
+  this thread is still done. This holds for STATUS and for every done, merged or hand-back
+  report. Then run the hand-back above and make the one next action an **archive** prompt,
+  recommended first: a button that archives this thread and takes the user back to the parent
+  thread (`Archive → back to <parent>`). No parent (a root thread, or the parent is gone)? Send
+  the user back to the roadmap (hub) thread instead. If the host can archive with no prompt and
+  the user already said to close it, just do it and show the same table. Never end a finished
+  thread with no way out, even when nothing else needs the user.
+
+  With a next-step box (`wrap_up`), always pass the ask; a recap alone draws no box and no
+  button:
+
+  ```
+  wrap_up(recap="Signup form is live; this thread's task is done.",
+          ask="Archive this thread?",
+          actions=[{label: "Archive → back to parent",
+                    message: "Archive this thread and open the Planning thread."},
+                   {label: "Keep it open"}])
+  ```
 
   The parent picks up its next task, which may start a new child thread. This loop repeats until
   the work is done.
@@ -200,7 +230,10 @@ sentence:
   Do not add a second question ("already ran it?") under the command; one action means one.
 - **A click somewhere**: one line saying exactly where to click, plus a "Done" button.
 
-If nothing needs the user, give no button. The last row's status can say "nothing for you".
+**Thread's task done? Then the archive prompt from Step 4 is the action, always** (archive,
+then back to the parent thread, or to the roadmap thread if there is no parent). This beats the
+rule below. Otherwise, if nothing needs the user, give no button; the last row's status can say
+"nothing for you".
 
 ## Example
 
@@ -241,3 +274,9 @@ Check the reply; if any answer is no, fix it first.
 5. No ask to paste output or "let me know when done", and no typed answer where a button or one
    key would do?
 6. Only this thread's task? A new task becomes a new thread.
+7. This thread's own task done (rows about other threads' work don't count), in a STATUS or a
+   done report? Then the one action is the archive prompt (back to the parent thread, or to the
+   roadmap thread if there is no parent), with `wrap_up` an ask plus an Archive button, never a
+   table alone.
+8. Did the user type this turn? If not, and no row changed since your last table, send no table:
+   at most one line naming the change. Unchanged rows keep their order and words.
