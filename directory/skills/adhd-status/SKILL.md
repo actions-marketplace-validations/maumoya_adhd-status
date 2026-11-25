@@ -8,19 +8,49 @@ license: MIT
 
 The user has ADHD. Long replies get skipped, open questions get lost, and "tell me when it's done"
 means it never gets done. When they say **STATUS**, give them one tiny table and one next step.
-Nothing else: no preamble, no recap, no closing line. The value is that they can glance, click,
+Nothing else in the text: no preamble, no recap, no closing line (the pinned checklist is the app's, not text). The value is that they can glance, click,
 and move on.
 
 **The reply starts with the table.** Its first line is `| Task | Why | Status |`. A summary
 sentence ("PR merged and live") is a ✅ row, never a line above the table. This also holds when
 other instructions ask for a closing message or a recap: the table is that message.
 
-**No repeat tables.** A new table only when the user typed this turn (status, a question, a
+## Display rules (owner rules, 2026-11-24)
+
+These four rules decide what the owner sees on every reply they type.
+
+1. **Two views, always.** The table (**last done**, **working now**, **next**) with, right after
+   it, the **live checklist** of the task and its sub-steps. Never only one of them, and never
+   wait to be asked. Keep the checklist current while work runs: tick a step when it is proved.
+2. **The live checklist is the app's pinned `update_plan` list** (spinner on the current step,
+   dotted circles for pending). Call it in the same message as the table, with every step and
+   sub-step of the current task. The headline (Live task list) is the text of that same message,
+   written just before the `update_plan` call, so it sits right above the list. The checklist is
+   only ever this native list: never a text or emoji copy of it (`✅ step · ⬜ step`), never
+   markdown `- [x]` boxes and never HTML tags such as `<sub>` in a reply.
+3. **The list stays on screen.** The pinned list does not go away when the work finishes: the
+   last `update_plan`, with every step completed and its time, is the record. So the final call
+   lists all steps done with `(took …)`, and nothing clears, empties or replaces it. While any
+   step is still running (CI, a build, a watcher), do NOT end the turn: wait in the foreground on
+   the real state (an until-loop on the PR or job, 10 min tool limit, repeat), and before each
+   wait write the current table as plain text, then refresh `update_plan` with the new elapsed
+   times, then wait. Refresh the table text only when a row changed. This holds in every thread,
+   child threads and briefs included. End the turn only when all steps are done or the owner
+   must act.
+4. **Every step shows its time** in plain parentheses at the end of its text: running
+   `(6m so far)`, finished `(took 9m37s)`; the task line shows its total (`(total 42m so far)`,
+   `(took 1h12m)`). Real times only (measured from CI timestamps or `date`); `(time n/a)` if
+   unknown. Show only the duration, never a clock time (no `03:48`, `04:07–04:16`). Keep the
+   running step's elapsed time current on every `update_plan` refresh. No tags.
+   Example: `Harness runtime (took 9m37s)`.
+
+**No repeat tables.** A new table only when the owner typed this turn (status, a question, a
 reply) or something they must see changed since your last table: a new ✅, ❌ or ⚠️, or a
-different 👉 action. A turn the user did not type (a background task or command finished, a
+different 👉 action. A turn the owner did not type (a background task or command finished, a
 task or thread notification, a scheduled wake-up, a hook sending the turn back) with no such
-change gets no table: at most one line naming what changed, or no reply at all. Rules that say
-"use it on every reply" or "every done report" mean replies to the user, not these turns.
+change gets no table: at most one line naming what changed, or no reply at all. Waits inside a
+typed turn follow rule 3, not this paragraph. Rules that say "use it on every reply" or "every
+done report" mean replies to the owner, not these turns.
 
 ## Step 1: sweep the whole conversation (silently)
 
@@ -322,6 +352,46 @@ Below, "hub thread" means whichever of the two it is.
 - **STATUS in any other MAIN thread** (it spawned children but keeps no roadmap file): the
   same hub table, built from the child threads it tracks (their last reports, checked live
   where cheap).
+- **Live task list (every thread, hosts with a pinned task list such as `update_plan`)**: while
+  working, every thread (LEAF too) keeps its own steps pinned as a checklist: short imperative
+  steps of at most 5 words (the time does not count), exactly one in progress, the rest pending or done. Tick each step the
+  moment it is proved, with its time (Display rules). This is the working view; a STATUS reply
+  still starts with the table.
+  - **Headline**: one or two plain sentences, the message text written just before the `update_plan`
+    call (same message), so the app shows it right above the list. It says what is done, what is running with
+    its ETA, and what comes next, e.g. "Three scanners are installed except Jev, which was
+    blocked at step 1 after about 35 minutes; the full test suite is running now (about 10
+    minutes), and the PR opens after that."
+  - **Times on steps**: a finished step says how long it took, `Read threat model, ADR, reports
+    (took ~5m)`; a blocked step says so, `Gate run on Jev: blocked at step 1 (took ~3m)`; the
+    step in progress shows elapsed time, `Full test suite (2m so far)`. Pending steps carry no
+    time.
+  - **Never erase the list.** When the work finishes it stays as the record: never clear the
+    plan or replace it with an empty one. A new plan for new work is added after the old steps,
+    not over them. The record is the native list itself, never a text or emoji copy in the reply.
+  - **Timings catch problems.** When a step runs well past its ETA, mark it ⚠️ in the headline
+    and as a table row, and say which it is in plain words: **over estimate** (slower than
+    planned), **stuck** (no progress since the last check), **broken** (a failing command or
+    check), or **underperforming** (a model or tool that is slow or keeps retrying). The hub
+    applies this to each child's mirrored steps too. Optional: a host that can save step timings
+    may keep a short local log (step, start, end, outcome) to compare runs; never store prompt
+    text in it.
+- **Live task list, parent threads (MAIN and MASTER) always show nested threads' live steps**:
+  the table is a snapshot, so the pinned list under it mirrors the nested threads too. This is
+  never optional and never waits to be asked.
+  - **MAIN** mirrors **every** step of each tracked child thread.
+  - **MASTER** mirrors, for each main thread, its **in-progress step** plus **every ⚠️ step**
+    (over estimate, stuck, broken, underperforming), since its table shows only a few rows.
+  - **How**: on every child report and every STATUS, read each nested thread's latest steps (a
+    host session-events tool such as `list_events`, or its last report) and pin them in that
+    thread's own words, tagged with its session (so the host shows its live state), with its
+    time: `(took ~Xm)` done, `(Xm so far)` in progress, none for pending. Then add the parent's
+    own steps after them (for example "Report merge to hub"). Tick only what the child proved,
+    never what it only claimed (Step 1.3).
+  - **Never clear the list**: a refresh rewrites the mirrored steps in place and keeps finished
+    ones. When a child is done, its merge, adopt and archive steps join the list as the
+    parent's own (the hub is the controller). The table still leads the reply; one line under it
+    may say the list mirrors the nested threads.
 - **STATUS in a LEAF thread**: the 3-row thread table about this thread's own task only; do
   not summarize the roadmap.
 
